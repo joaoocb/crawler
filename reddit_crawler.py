@@ -1,29 +1,24 @@
 #! usr/bin/env python3
+import config
 import praw
 from pymongo import MongoClient
 import re
-
-#TODO: This information shlud be in a config file
-CLIENT_ID = "lbUv4p2Fa11vyw"
-CLIENT_SECRET = "S1MeJIXIt47AglQv_HsPsYlS0g8"
-USER_AGENT = "reddit_crawler"
-USERNAME = "joaoocb"
-PASSWORD = "vrat$8#9"
-MONGODB_SERVER = "localhost"
-MONGODB_PORT = 27017
 
 class RedditCrawler:
 
     def __init__(self, subreddit_name):
         # Create reddit and subreddit instances
-        self.reddit = praw.Reddit(client_id = CLIENT_ID, client_secret = CLIENT_SECRET,
-                                  user_agent = USER_AGENT, username = USERNAME,
-                                  password = PASSWORD)
+        self.reddit = praw.Reddit(client_id =     config.REDDIT_CONFIG["client_id"],
+                                  client_secret = config.REDDIT_CONFIG["client_secret"],
+                                  user_agent =    config.REDDIT_CONFIG["user_agent"],
+                                  username =      config.REDDIT_CONFIG["username"],
+                                  password =      config.REDDIT_CONFIG["password"])
         self.subreddit = self.reddit.subreddit(subreddit_name)
 
         # Connect to data base
         try:
-            self.mongo_client = MongoClient(MONGODB_SERVER, MONGODB_PORT)
+            self.mongo_client = MongoClient(config.DATABASE_CONFIG["mongodb_server"],
+                                            config.DATABASE_CONFIG["mongodb_port"])
             self.database = self.mongo_client["reddit_database"]
             self.colection = self.database["topics"]
         except:
