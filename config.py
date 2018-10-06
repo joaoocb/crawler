@@ -10,3 +10,8 @@ REDDIT_CONFIG = {
     "username": "",
     "password": ""
 }
+
+TELEGRAM_CONFIG = {
+    "api_id": "",
+    "api_hash": ""
+}

@@ -1,30 +1,43 @@
-from pyrogram import Client, Filters
+import config
+from pyrogram import Client, Filters, MessageHandler
 from pymongo import MongoClient
 import json
 
-app = Client("my_account")
+class TelegramCrawler:
 
-#mongodb init
-try:
-	client = MongoClient('localhost', 27017)
-	client.server_info()
-	db = client.crawler_database
-	collection = db.telegram_collection
-	posts = db.posts
-except:
-	print("No mongodb servers found")
-	exit()
+    def __init__(self, account_name):
+        # Setup telegram client
+        self.telegram = Client(account_name, config.TELEGRAM_CONFIG["api_id"],
+                               config.TELEGRAM_CONFIG["api_hash"])
+        self.telegram.add_handler(MessageHandler(self.message_handler,
+                                  Filters.regex("(?i)(eos rio|eosrio|simpleos)") &
+                                  Filters.text & ~Filters.private))
 
+        # Connect to data base
+        try:
+            self.mongo_client = MongoClient(config.DATABASE_CONFIG["mongodb_server"],
+                                            config.DATABASE_CONFIG["mongodb_port"])
+            self.mongo_client.server_info()
 
-@app.on_message(Filters.regex("(?i)(eos rio|eosrio|simpleos)") & Filters.text & ~Filters.private)
-def message_handler(client, message):
-    #print("\nGroup:", message["chat"]["title"], "\nMessage:", message["text"], "\nDate:", message["date"])
-    print(message)
-    try:
-    	result = posts.insert_one(json.loads(str(message))).inserted_id
-    	print(result)
-    except:
-    	print("DB connection error")
+            self.database = self.mongo_client["telegram_database"]
+            self.posts = self.database["posts"]
+        except:
+            print("No mongodb serve found")
+            exit()
 
+    def message_handler(self, client, message):
+        #print("\nGroup:", message["chat"]["title"], "\nMessage:", message["text"],
+        #"\nDate:", message["date"])
+        print(message)
 
-app.run()
+        try:
+        	result = self.posts.insert_one(json.loads(str(message))).inserted_id
+        	print(result)
+        except:
+            print("Failed to insert data to DataBase")
+
+    def run(self):
+        self.telegram.run()
+
+telegram = TelegramCrawler("my_account")
+telegram.run()
