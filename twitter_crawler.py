@@ -25,6 +25,9 @@ class MyListener(StreamListener):
         print(status)
         return True
 
+    def __del__(self):
+        self.mongo_client.close()
+
 #Crawler Class
 class TwitterCrawler():
     def __init__(self):
