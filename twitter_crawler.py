@@ -13,11 +13,8 @@ from tweepy.streaming import StreamListener
 # auth = OAuthHandler(consumer_key, consumer_secret)
 # auth.set_access_token(access_token, access_secret)
 
-class TwitterCrawler():
-    def __init__(self, StreamListener):
-        # Setup twitter client
-        self.twitter = OAuthHandler(config.TWITTER_CONFIG["consumer_key"], config.TWITTER_CONFIG["consumer_secret"])
-        self.auth.set_access_token(config.TWITTER_CONFIG["access_token"], config.TWITTER_CONFIG["access_secret"])
+class MyListener(StreamListener):
+ 
     def on_data(self, data):
         try:
             with open('python.json', 'a') as f:
@@ -31,6 +28,17 @@ class TwitterCrawler():
         print(status)
         return True
 
+
+
+class TwitterCrawler():
+    def __init__(self):
+        # Setup twitter client
+        self.auth = OAuthHandler(config.TWITTER_CONFIG["consumer_key"], config.TWITTER_CONFIG["consumer_secret"])
+        self.auth.set_access_token(config.TWITTER_CONFIG["access_token"], config.TWITTER_CONFIG["access_secret"])
+
     def run(self):
-        twitter_stream = Stream(auth, TwitterCrawler())
+        twitter_stream = Stream(self.auth, MyListener())
         twitter_stream.filter(track=['eosrio','simpleos'])
+
+teste = TwitterCrawler()
+teste.run()
