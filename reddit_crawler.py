@@ -31,6 +31,9 @@ class RedditCrawler(threading.Thread):
             print("No mongodb serve found")
             exit()
 
+    def __del__(self):
+        self.mongo_client.close()
+
     def readTopics(self):
         while True:
             # Check for now topics
