@@ -15,6 +15,7 @@ TELEGRAM_CONFIG = {
     "api_id": "",
     "api_hash": ""
 }
+
 TWITTER_CONFIG = {
     "consumer_key": "",
 	"consumer_secret": "",
