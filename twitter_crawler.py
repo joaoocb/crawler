@@ -1,25 +1,23 @@
-from tweepy import Stream, OAuthHandler
-from tweepy.streaming import StreamListener
+import config
 import re
 import json
+from tweepy import Stream, OAuthHandler
+from tweepy.streaming import StreamListener
 
-#twitter app info	
-consumer_key = 'consumer_key'
-consumer_secret = 'consumer_secret'
-access_token = 'access_token'
-access_secret = 'access_secret'
+#twitter app info   
+# consumer_key = 'kkiLCRxtYmsHCcE4tmwdVinpI'
+# consumer_secret = 'FRV0r23TjIvnRrYX2oPpr8wVPO1LuTe8kla2ohkIny1jMq45rP'
+# access_token = '2903950480-ry3E0SPuew7gj3fX7kcA6C2FfHpdGGe1m2oMHQH'
+# access_secret = 'x0uGjnL7rbuTodRfDxZd88Fe6TYyGw6NFqs0qeu2UOHMF'
  
-auth = OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_secret)
- 
-# api = tweepy.API(auth)
+# auth = OAuthHandler(consumer_key, consumer_secret)
+# auth.set_access_token(access_token, access_secret)
 
-regex_str = "(?i)(eos rio|eosrio|simpleos)"
-
-# match = re.search(r'(?i)(eos rio|eosrio|simpleos)', data["text"])
-
-class MyListener(StreamListener):
- 
+class TwitterCrawler():
+    def __init__(self, StreamListener):
+        # Setup twitter client
+        self.twitter = OAuthHandler(config.TWITTER_CONFIG["consumer_key"], config.TWITTER_CONFIG["consumer_secret"])
+        self.auth.set_access_token(config.TWITTER_CONFIG["access_token"], config.TWITTER_CONFIG["access_secret"])
     def on_data(self, data):
         try:
             with open('python.json', 'a') as f:
@@ -32,8 +30,7 @@ class MyListener(StreamListener):
     def on_error(self, status):
         print(status)
         return True
- 
-twitter_stream = Stream(auth, MyListener())
-twitter_stream.filter(track=['eos'])
 
-
+    def run(self):
+        twitter_stream = Stream(auth, TwitterCrawler())
+        twitter_stream.filter(track=['eosrio','simpleos'])
