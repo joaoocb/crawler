@@ -4,17 +4,10 @@ import json
 from tweepy import Stream, OAuthHandler
 from tweepy.streaming import StreamListener
 
-#twitter app info   
-# consumer_key = 'kkiLCRxtYmsHCcE4tmwdVinpI'
-# consumer_secret = 'FRV0r23TjIvnRrYX2oPpr8wVPO1LuTe8kla2ohkIny1jMq45rP'
-# access_token = '2903950480-ry3E0SPuew7gj3fX7kcA6C2FfHpdGGe1m2oMHQH'
-# access_secret = 'x0uGjnL7rbuTodRfDxZd88Fe6TYyGw6NFqs0qeu2UOHMF'
- 
-# auth = OAuthHandler(consumer_key, consumer_secret)
-# auth.set_access_token(access_token, access_secret)
-
+#Listener handler
 class MyListener(StreamListener):
- 
+    
+    #TODO save to mongodb
     def on_data(self, data):
         try:
             with open('python.json', 'a') as f:
@@ -28,8 +21,7 @@ class MyListener(StreamListener):
         print(status)
         return True
 
-
-
+#Crawler Class
 class TwitterCrawler():
     def __init__(self):
         # Setup twitter client
