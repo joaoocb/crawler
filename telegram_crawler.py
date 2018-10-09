@@ -25,7 +25,7 @@ class TelegramCrawler(threading.Thread):
             self.database = self.mongo_client["telegram_database"]
             self.posts = self.database["posts"]
         except:
-            print("No mongodb serve found")
+            print("Telegram: No mongodb serve found")
             exit()
 
     def __del__(self):
@@ -38,9 +38,9 @@ class TelegramCrawler(threading.Thread):
 
         try:
         	result = self.posts.insert_one(json.loads(str(message))).inserted_id
-        	print(result)
+        	#print(result)
         except:
-            print("Failed to insert data to DataBase")
+            print("Telegram: Error inserting data!")
 
     def run(self):
         self.telegram.run()

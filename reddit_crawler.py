@@ -28,7 +28,7 @@ class RedditCrawler(threading.Thread):
             self.database = self.mongo_client["reddit_database"]
             self.colection = self.database["topics"]
         except:
-            print("No mongodb serve found")
+            print("Reddit: No mongodb serve found")
             exit()
 
     def __del__(self):
@@ -53,7 +53,7 @@ class RedditCrawler(threading.Thread):
                         result = self.colection.insert_one(topic).inserted_id
                         print(result)
                     except:
-                        print("Failed to insert data to DataBase")
+                        print("Reedit: Error inserting data!")
 
             #TODO: Check for new comments
 
