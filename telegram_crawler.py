@@ -28,6 +28,9 @@ class TelegramCrawler(threading.Thread):
             print("No mongodb serve found")
             exit()
 
+    def __del__(self):
+        self.mongo_client.close()
+
     def message_handler(self, client, message):
         #print("\nGroup:", message["chat"]["title"], "\nMessage:", message["text"],
         #"\nDate:", message["date"])
