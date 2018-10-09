@@ -16,6 +16,7 @@ class MyListener(StreamListener):
 
             self.database = self.mongo_client["twitter_database"]
             self.posts = self.database["posts"]
+            return True
         except:
             print("No mongodb serve found")
             exit()
@@ -35,6 +36,9 @@ class TwitterCrawler():
 
     def run(self):
         self.twitter_stream.filter(track=['eosrio','simpleos'])
+
+    def stop(self):
+        self.twitter_stream.disconnect()
 
 teste = TwitterCrawler()
 teste.run()
