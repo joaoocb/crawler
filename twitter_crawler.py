@@ -7,15 +7,18 @@ from tweepy.streaming import StreamListener
 #Listener handler
 class MyListener(StreamListener):
     
-    #TODO save to mongodb
+    # Connect to data base
     def on_data(self, data):
         try:
-            with open('python.json', 'a') as f:
-                f.write(data)
-                return True
-        except BaseException as e:
-            print("Error on_data: %s" % str(e))
-        return True
+            self.mongo_client = MongoClient(config.DATABASE_CONFIG["mongodb_server"],
+                                            config.DATABASE_CONFIG["mongodb_port"])
+            self.mongo_client.server_info()
+
+            self.database = self.mongo_client["twitter_database"]
+            self.posts = self.database["posts"]
+        except:
+            print("No mongodb serve found")
+            exit()
  
     def on_error(self, status):
         print(status)
@@ -27,10 +30,11 @@ class TwitterCrawler():
         # Setup twitter client
         self.auth = OAuthHandler(config.TWITTER_CONFIG["consumer_key"], config.TWITTER_CONFIG["consumer_secret"])
         self.auth.set_access_token(config.TWITTER_CONFIG["access_token"], config.TWITTER_CONFIG["access_secret"])
+        #authenticate and create a stream
+        self.twitter_stream = Stream(self.auth, MyListener())
 
     def run(self):
-        twitter_stream = Stream(self.auth, MyListener())
-        twitter_stream.filter(track=['eosrio','simpleos'])
+        self.twitter_stream.filter(track=['eosrio','simpleos'])
 
 teste = TwitterCrawler()
 teste.run()
