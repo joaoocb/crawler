@@ -1,12 +1,16 @@
-#! usr/bin/env python3
 import config
+import threading
 from praw import Reddit
 from pymongo import MongoClient
 import re
 
-class RedditCrawler:
+class RedditCrawler(threading.Thread):
 
     def __init__(self, subreddit_name):
+        threading.Thread.__init__(self)
+        self.threadLock = threading.Lock()
+        self.stop = False
+
         # Create reddit and subreddit instances
         self.reddit = Reddit(client_id =     config.REDDIT_CONFIG["client_id"],
                              client_secret = config.REDDIT_CONFIG["client_secret"],
@@ -28,24 +32,41 @@ class RedditCrawler:
             exit()
 
     def readTopics(self):
-        for submission in self.subreddit.stream.submissions():
-            if(re.search(r"eos rio|eosrio|simpleos", submission.title, re.IGNORECASE)):
-                topic = {"title":        submission.title,
-                         "score":        submission.score,
-                         "id":           submission.id,
-                         "url":          submission.url,
-                         "num_comments": submission.num_comments,
-                         "created":      submission.created,
-                         "body":         submission.selftext}
+        while True:
+            # Check for now topics
+            for submission in self.subreddit.stream.submissions(pause_after = 0):
+                if submission is None:
+                    break
+                elif(re.search(r"eos rio|eosrio|simpleos", submission.title, re.IGNORECASE)):
+                    topic = {"title":        submission.title,
+                             "score":        submission.score,
+                             "id":           submission.id,
+                             "url":          submission.url,
+                             "num_comments": submission.num_comments,
+                             "created":      submission.created,
+                             "body":         submission.selftext}
 
-                try:
-                    result = self.colection.insert_one(topic).inserted_id
-                    print(result)
-                except:
-                    print("Failed to insert data to DataBase")
+                    try:
+                        result = self.colection.insert_one(topic).inserted_id
+                        print(result)
+                    except:
+                        print("Failed to insert data to DataBase")
+
+            #TODO: Check for new comments
+
+            # Check if thread should end
+            self.threadLock.acquire()
+            if self.stop:
+                break
+            self.threadLock.release()
 
     def run(self):
         self.readTopics()
+
+    def stop(self):
+        self.threadLock.acquire()
+        self.stop = True
+        self.threadLock.release()
 
 reddit = RedditCrawler("eos")
 reddit.run()

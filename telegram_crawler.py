@@ -1,11 +1,14 @@
 import config
+import threading
 from pyrogram import Client, Filters, MessageHandler
 from pymongo import MongoClient
 import json
 
-class TelegramCrawler:
+class TelegramCrawler(threading.Thread):
 
     def __init__(self, account_name):
+        threading.Thread.__init__(self)
+
         # Setup telegram client
         self.telegram = Client(account_name, config.TELEGRAM_CONFIG["api_id"],
                                config.TELEGRAM_CONFIG["api_hash"])
@@ -38,6 +41,9 @@ class TelegramCrawler:
 
     def run(self):
         self.telegram.run()
+
+    def stop(self):
+        self.telegram.stop()
 
 telegram = TelegramCrawler("my_account")
 telegram.run()
