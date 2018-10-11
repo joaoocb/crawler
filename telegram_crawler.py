@@ -10,6 +10,7 @@ class TelegramCrawler(threading.Thread):
         threading.Thread.__init__(self)
 
         # Setup telegram client
+        self.receiver = config.TELEGRAM_CONFIG["receiver"]
         self.telegram = Client(account_name, config.TELEGRAM_CONFIG["api_id"],
                                config.TELEGRAM_CONFIG["api_hash"])
         self.telegram.add_handler(MessageHandler(self.message_handler,
@@ -32,15 +33,18 @@ class TelegramCrawler(threading.Thread):
         self.mongo_client.close()
 
     def message_handler(self, client, message):
-        #print("\nGroup:", message["chat"]["title"], "\nMessage:", message["text"],
-        #"\nDate:", message["date"])
-        print(message)
-
+        #print(message)
         try:
-        	result = self.posts.insert_one(json.loads(str(message))).inserted_id
-        	#print(result)
+            result = self.posts.insert_one(json.loads(str(message))).inserted_id
+            #print(result)
+            self.sendmessage(message)
         except:
             print("Telegram: Error inserting data!")
+
+    #send filter message to spefic user
+    def sendmessage(self, message):
+        message = "Group: " + message["chat"]["title"] + "\nMessage: " + message["text"]
+        self.telegram.send_message(self.receiver, message)
 
     def run(self):
         self.telegram.run()

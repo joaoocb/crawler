@@ -13,7 +13,8 @@ REDDIT_CONFIG = {
 
 TELEGRAM_CONFIG = {
     "api_id": "",
-    "api_hash": ""
+    "api_hash": "",
+    "receiver": ""
 }
 
 TWITTER_CONFIG = {
