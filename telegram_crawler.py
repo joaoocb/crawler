@@ -41,9 +41,9 @@ class TelegramCrawler(threading.Thread):
         except:
             print("Telegram: Error inserting data!")
 
-    #send filter message to spefic user
+    #send filtered message on telegram to spefic user
     def sendmessage(self, message):
-        message = "Group: " + message["chat"]["title"] + "\nMessage: " + message["text"]
+        message = "Crawler - Telegram" + "\nGroup: " + message["chat"]["title"] + "\nMessage: " + message["text"]
         self.telegram.send_message(self.receiver, message)
 
     def run(self):

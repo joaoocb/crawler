@@ -2,6 +2,7 @@ import config
 import threading
 from praw import Reddit
 from pymongo import MongoClient
+from pyrogram import Client
 import re
 
 class RedditCrawler(threading.Thread):
@@ -18,6 +19,12 @@ class RedditCrawler(threading.Thread):
                              username =      config.REDDIT_CONFIG["username"],
                              password =      config.REDDIT_CONFIG["password"])
         self.subreddit = self.reddit.subreddit(subreddit_name)
+
+        # Setup telegram client
+        self.receiver = config.TELEGRAM_CONFIG["receiver"]
+        self.telegram = Client(config.TELEGRAM_CONFIG["account_name"], config.TELEGRAM_CONFIG["api_id"],
+                               config.TELEGRAM_CONFIG["api_hash"])
+        self.telegram.start()
 
         # Connect to data base
         try:
@@ -51,7 +58,8 @@ class RedditCrawler(threading.Thread):
 
                     try:
                         result = self.colection.insert_one(topic).inserted_id
-                        print(result)
+                        self.sendmessage(topic)
+                        #print(result)
                     except:
                         print("Reedit: Error inserting data!")
 
@@ -63,6 +71,11 @@ class RedditCrawler(threading.Thread):
                 break
             self.threadLock.release()
 
+    #send filtered message on telegram to spefic user
+    def sendmessage(self, message):
+        message = "Crawler - Reddit" + "\nTitle: " + message["title"] + "\nMessage: " + message["body"] + "\nUrl: " + message["url"]
+        self.telegram.send_message(self.receiver, message)
+
     def run(self):
         self.readTopics()
 
@@ -70,6 +83,7 @@ class RedditCrawler(threading.Thread):
         self.threadLock.acquire()
         self.stop = True
         self.threadLock.release()
+        self.telegram.stop()
 
 reddit = RedditCrawler("eos")
 reddit.run()
