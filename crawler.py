@@ -1,33 +1,27 @@
-import config
-#import telegram_crawler
-#import twitter_crawler
-#import reddit_crawler
+import os   
+import signal                                                                    
+from multiprocessing import Pool 
 
-import time
+processes = ('twitter.py', 'telegram.py')
 
-class Crawler:
-    def __init__(self):
-        print("__init__")
 
-    def __del__(self):
-        print("__del__")
-
-    def start(self):
-        print("start")
-
-    def stop(self):
-        print("stop")
+def run_crawler(process):
+    os.system('python {}'.format(process))
 
 
 def main():
-    crawler = Crawler()
-    crawler.start()
-
+    #original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
+    pool = Pool(processes=2)
+    pool.daemon=True
+    #signal.signal(signal.SIGINT, original_sigint_handler)
     try:
-        while True:
-            time.sleep(10) 
+        print('Press Ctrl+C to stop')
+        pool.map(run_crawler, processes)
     except KeyboardInterrupt:
-        print("Keyboard Interrupt received! Stoping...")
-        crawler.stop()
+        print("Keyboard interrupt received! Stoping...")
+        pool.terminate()
+        pool.join()
+        pass
 
-main()
+if __name__ == '__main__':
+    main()

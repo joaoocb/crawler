@@ -1,14 +1,15 @@
 import config
-import threading
+import sys
+import json
+import signal
 from pyrogram import Client, Filters, MessageHandler
 from pymongo import MongoClient
-import json
 
-class TelegramCrawler(threading.Thread):
+
+class TelegramCrawler():
 
     def __init__(self, account_name):
-        threading.Thread.__init__(self)
-
+        signal.signal(signal.SIGINT, self.stop)
         # Setup telegram client
         self.receiver = config.TELEGRAM_CONFIG["receiver"]
         self.telegram = Client(account_name, config.TELEGRAM_CONFIG["api_id"],
@@ -27,30 +28,32 @@ class TelegramCrawler(threading.Thread):
             self.posts = self.database["posts"]
         except:
             print("Telegram: No mongodb serve found")
-            exit()
 
     def __del__(self):
         self.mongo_client.close()
+        self.telegram.stop()
+        sys.exit()
 
     def message_handler(self, client, message):
         #print(message)
         try:
             result = self.posts.insert_one(json.loads(str(message))).inserted_id
             #print(result)
+            message = "Crawler - Telegram" + "\nGroup: " + message["chat"]["title"] + "\nMessage: " + message["text"]
             self.sendmessage(message)
         except:
             print("Telegram: Error inserting data!")
 
     #send filtered message on telegram to spefic user
     def sendmessage(self, message):
-        message = "Crawler - Telegram" + "\nGroup: " + message["chat"]["title"] + "\nMessage: " + message["text"]
         self.telegram.send_message(self.receiver, message)
 
     def run(self):
-        self.telegram.run()
+        self.telegram.start()
 
     def stop(self):
         self.telegram.stop()
 
-telegram = TelegramCrawler("my_account")
-telegram.run()
+if __name__ == '__main__':
+    telegram = TelegramCrawler("my_account")
+    telegram.run()
