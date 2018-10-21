@@ -2,7 +2,7 @@ import os
 import signal                                                                    
 from multiprocessing import Pool 
 
-processes = ('twitter.py', 'telegram.py')
+processes = ('twitter_crawler.py', 'telegram_crawler.py')
 
 
 def run_crawler(process):
