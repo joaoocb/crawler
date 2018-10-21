@@ -12,10 +12,10 @@ class MyListener(StreamListener):
     def __init__(self):
 
         #Setup telegram client
-        self.receiver = config.TELEGRAM_CONFIG["receiver"]
-        self.telegram = Client(config.TELEGRAM_CONFIG["account_name"], config.TELEGRAM_CONFIG["api_id"],
-                               config.TELEGRAM_CONFIG["api_hash"])
-        self.telegram.start()
+        # self.receiver = config.TELEGRAM_CONFIG["receiver"]
+        # self.telegram = Client(config.TELEGRAM_CONFIG["account_name"], config.TELEGRAM_CONFIG["api_id"],
+        #                        config.TELEGRAM_CONFIG["api_hash"])
+        # self.telegram.start()
         
         # Connect to data base
         try:
@@ -42,7 +42,7 @@ class MyListener(StreamListener):
     def sendmessage(self, message):
         message = "Crawler - Twitter" + "\nUser: " + message["user"]["screen_name"] + "\nTweet: " + message["text"]
         #print(message)
-        self.telegram.send_message(self.receiver, message)
+        #self.telegram.send_message(self.receiver, message)
  
     def on_error(self, status):
         print(status)
@@ -50,7 +50,7 @@ class MyListener(StreamListener):
 
     def __del__(self):
         self.mongo_client.close()
-        self.telegram.stop()
+        #self.telegram.stop()
 
 #Crawler Class
 class TwitterCrawler():
