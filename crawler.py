@@ -2,7 +2,7 @@ import os
 import signal                                                                    
 from multiprocessing import Pool 
 
-processes = ('twitter_crawler.py', 'telegram_crawler.py')
+processes = ('twitter_crawler.py', 'telegram_crawler.py', 'reddit_crawler.py')
 
 
 def run_crawler(process):
@@ -11,7 +11,7 @@ def run_crawler(process):
 
 def main():
     #original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
-    pool = Pool(processes=2)
+    pool = Pool(processes=3)
     pool.daemon=True
     #signal.signal(signal.SIGINT, original_sigint_handler)
     try:
