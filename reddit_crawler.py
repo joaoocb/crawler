@@ -20,11 +20,11 @@ class RedditCrawler(threading.Thread):
                              password =      config.REDDIT_CONFIG["password"])
         self.subreddit = self.reddit.subreddit(subreddit_name)
 
-        # Setup telegram client
-        self.receiver = config.TELEGRAM_CONFIG["receiver"]
-        self.telegram = Client(config.TELEGRAM_CONFIG["account_name"], config.TELEGRAM_CONFIG["api_id"],
-                               config.TELEGRAM_CONFIG["api_hash"])
-        self.telegram.start()
+        # # Setup telegram client
+        # self.receiver = config.TELEGRAM_CONFIG["receiver"]
+        # self.telegram = Client(config.TELEGRAM_CONFIG["account_name"], config.TELEGRAM_CONFIG["api_id"],
+        #                        config.TELEGRAM_CONFIG["api_hash"])
+        # self.telegram.start()
 
         # Connect to data base
         try:
@@ -58,7 +58,7 @@ class RedditCrawler(threading.Thread):
 
                     try:
                         result = self.colection.insert_one(topic).inserted_id
-                        self.sendmessage(topic)
+                        #self.sendmessage(topic)
                         #print(result)
                     except:
                         print("Reedit: Error inserting data!")
@@ -74,7 +74,7 @@ class RedditCrawler(threading.Thread):
     #send filtered message on telegram to spefic user
     def sendmessage(self, message):
         message = "Crawler - Reddit" + "\nTitle: " + message["title"] + "\nMessage: " + message["body"] + "\nUrl: " + message["url"]
-        self.telegram.send_message(self.receiver, message)
+        #self.telegram.send_message(self.receiver, message)
 
     def run(self):
         self.readTopics()
@@ -83,7 +83,8 @@ class RedditCrawler(threading.Thread):
         self.threadLock.acquire()
         self.stop = True
         self.threadLock.release()
-        self.telegram.stop()
+        #self.telegram.stop()
 
-reddit = RedditCrawler("eos")
-reddit.run()
+if __name__ == '__main__':
+    reddit = RedditCrawler("eos")
+    reddit.run()
